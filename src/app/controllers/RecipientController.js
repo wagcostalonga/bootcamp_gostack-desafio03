@@ -91,7 +91,13 @@ class RecipientController {
   }
 
   async index(req, res) {
-    const recipient = await Recipient.findAll();
+    const { page = 1 } = req.query;
+
+    const recipient = await Recipient.findAll({
+      order: ['id'],
+      limit: 5,
+      offset: (page - 1) * 5,
+    });
     return res.json(recipient);
   }
 }

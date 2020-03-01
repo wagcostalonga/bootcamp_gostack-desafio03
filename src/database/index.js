@@ -1,21 +1,37 @@
 import Sequelize from 'sequelize';
-
-import databaseConfig from '../config/database';
+import mongoose from 'mongoose';
 
 import User from '../app/models/User';
 import Recipient from '../app/models/Recipient';
+import File from '../app/models/File';
+import Deliveryman from '../app/models/Deliveryman';
+import Delivery from '../app/models/Delivery';
+import Problem from '../app/models/Problem';
 
-const models = [User, Recipient];
+import databaseConfig from '../config/database';
+
+const models = [User, Recipient, File, Deliveryman, Delivery, Problem];
 
 class Database {
   constructor() {
     this.init();
+    this.mongo();
   }
 
   init() {
     this.connection = new Sequelize(databaseConfig);
 
-    models.map(model => model.init(this.connection));
+    models
+      .map(model => model.init(this.connection))
+      .map(model => model.associate && model.associate(this.connection.models));
+  }
+
+  mongo() {
+    this.mongoConnection = mongoose.connect(process.env.MONGO_URL, {
+      useNewUrlParser: true,
+      useFindAndModify: true,
+      useUnifiedTopology: true,
+    });
   }
 }
 
